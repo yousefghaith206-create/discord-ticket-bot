@@ -9,12 +9,12 @@ from discord.ext import commands
 from core import COLOR, GREEN, RED, cfg, is_staff, now, store
 
 DEFAULT_RULES = (
-    "1. Respect everyone — no racism, harassment or hate.\n"
-    "2. No spam, self-promo or advertising without a partnership.\n"
-    "3. Don't re-upload or sell our addons as your own.\n"
-    "4. Use the right channels — help goes in a ticket.\n"
-    "5. No NSFW, scams or harmful files.\n"
-    "6. Staff decisions are final."
+    "1. احترم الجميع — ممنوع العنصرية والتنمّر والإساءة.\n"
+    "2. ممنوع السبام والإعلانات بدون شراكة.\n"
+    "3. ممنوع إعادة رفع أو بيع إضافاتنا باسمك.\n"
+    "4. استخدم الرومات الصح — المساعدة تكون في تذكرة.\n"
+    "5. ممنوع المحتوى +18 والنصب والملفات الضارة.\n"
+    "6. قرار الإدارة نهائي."
 )
 
 
@@ -24,22 +24,22 @@ class VerifyView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="I accept the rules", emoji="✅", style=discord.ButtonStyle.success,
+    @discord.ui.button(label="أوافق على القوانين", emoji="✅", style=discord.ButtonStyle.success,
                        custom_id="verify:accept")
     async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
         role_id = cfg(interaction.guild)["verify_role"]
         role = interaction.guild.get_role(role_id) if role_id else None
         if role is None:
             return await interaction.response.send_message(
-                "Verification isn't set up yet. Ask an admin to run `/config verify-role`.", ephemeral=True)
+                "التوثيق مو مفعّل بعد. خل الأدمن يسوي `/config verify-role`.", ephemeral=True)
         if role in interaction.user.roles:
-            return await interaction.response.send_message("You're already verified ✅", ephemeral=True)
+            return await interaction.response.send_message("أنت موثّق من قبل ✅", ephemeral=True)
         try:
             await interaction.user.add_roles(role, reason="Accepted the rules")
         except discord.Forbidden:
             return await interaction.response.send_message(
-                "I can't give that role — my role must be above it.", ephemeral=True)
-        await interaction.response.send_message(f"Welcome to the city! You got {role.mention} 🎉", ephemeral=True)
+                "ما أقدر أعطي الرتبة — لازم رتبتي تكون فوقها.", ephemeral=True)
+        await interaction.response.send_message(f"هلا وغلا! أخذت رتبة {role.mention} 🎉", ephemeral=True)
 
 
 # ─────────── whitelist applications ───────────
@@ -195,12 +195,12 @@ class Community(commands.Cog):
         if channel is None:
             return
         e = discord.Embed(
-            title=f"Welcome to {member.guild.name}! 👋",
-            description=f"Hey {member.mention}, welcome!\n"
-                        "Read the rules, check out the addons, and open a ticket if you need help.",
+            title=f"أهلاً فيك في {member.guild.name}! 👋",
+            description=f"هلا {member.mention}، نورت السيرفر!\n"
+                        "اقرأ القوانين، وشوف الإضافات، ولو احتجت مساعدة افتح تذكرة.",
             color=COLOR)
         e.set_thumbnail(url=member.display_avatar.url)
-        e.set_footer(text=f"You are member #{member.guild.member_count}")
+        e.set_footer(text=f"أنت العضو رقم {member.guild.member_count}")
         try:
             await channel.send(content=member.mention, embed=e)
         except discord.HTTPException:
@@ -211,11 +211,11 @@ class Community(commands.Cog):
     @app_commands.guild_only()
     @app_commands.describe(rules="Your rules (use \\n for new lines). Leave empty for default GTA RP rules.")
     async def verify_panel(self, interaction: discord.Interaction, rules: str | None = None):
-        e = discord.Embed(title="📜 Server rules", color=COLOR,
+        e = discord.Embed(title="📜 قوانين السيرفر", color=COLOR,
                           description=(rules.replace("\\n", "\n") if rules else DEFAULT_RULES)
-                          + "\n\nPress the button below to accept and unlock the server.")
+                          + "\n\nاضغط الزر تحت عشان توافق وتفتح لك الرومات.")
         await interaction.channel.send(embed=e, view=VerifyView())
-        await interaction.response.send_message("✅ Verify panel posted.", ephemeral=True)
+        await interaction.response.send_message("✅ تم نشر لوحة التوثيق.", ephemeral=True)
 
     @app_commands.command(name="apply-panel", description="Post the whitelist application panel")
     @app_commands.default_permissions(administrator=True)
@@ -235,13 +235,13 @@ class Community(commands.Cog):
     async def suggest(self, interaction: discord.Interaction, idea: app_commands.Range[str, 10, 1000]):
         channel_id = cfg(interaction.guild)["suggestion_channel"]
         channel = interaction.guild.get_channel(channel_id) if channel_id else interaction.channel
-        e = discord.Embed(title="💡 New suggestion", description=idea, color=COLOR, timestamp=now())
+        e = discord.Embed(title="💡 اقتراح جديد", description=idea, color=COLOR, timestamp=now())
         e.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
-        e.set_footer(text="Vote below!")
+        e.set_footer(text="صوّت تحت!")
         msg = await channel.send(embed=e)
         for emoji in ("✅", "❌"):
             await msg.add_reaction(emoji)
-        await interaction.response.send_message(f"✅ Suggestion posted in {channel.mention}", ephemeral=True)
+        await interaction.response.send_message(f"✅ تم نشر اقتراحك في {channel.mention}", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

@@ -17,8 +17,8 @@ class Utility(commands.Cog):
 
     @app_commands.command(name="help", description="Show every command")
     async def help(self, interaction: discord.Interaction):
-        e = discord.Embed(title="📖 Commands", color=COLOR,
-                          description="Admins: start with `/config view` to see what still needs setting up.")
+        e = discord.Embed(title="📖 الأوامر", color=COLOR,
+                          description="للأدمن: ابدأ بـ `/config view` عشان تشوف وش باقي يحتاج إعداد.")
         total = 0
         for name, cog in self.bot.cogs.items():
             lines = []
@@ -31,12 +31,12 @@ class Utility(commands.Cog):
                 value = "\n".join(lines)
                 e.add_field(name=f"{CATEGORY_EMOJI.get(name, '•')} {name}",
                             value=value if len(value) <= 1024 else value[:1020] + "…", inline=False)
-        e.set_footer(text=f"{total} commands")
+        e.set_footer(text=f"{total} أمر")
         await interaction.response.send_message(embed=e, ephemeral=True)
 
     @app_commands.command(name="ping", description="Check if the bot is alive")
     async def ping(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f"🏓 Pong! {round(self.bot.latency * 1000)}ms")
+        await interaction.response.send_message(f"🏓 بونق! {round(self.bot.latency * 1000)}ms")
 
     @app_commands.command(name="userinfo", description="Info about a member")
     @app_commands.guild_only()

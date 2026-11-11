@@ -12,15 +12,15 @@ from core import COLOR, GREEN, RED, cfg, fmt_duration, now, parse_duration, send
 def hierarchy_problem(interaction: discord.Interaction, target: discord.Member) -> str | None:
     guild, mod = interaction.guild, interaction.user
     if target == mod:
-        return "You can't do that to yourself."
+        return "ما تقدر تسويها على نفسك."
     if target == guild.owner:
-        return "You can't do that to the server owner."
+        return "ما تقدر تسويها على صاحب السيرفر."
     if target == guild.me:
         return "Nice try 😄"
     if mod != guild.owner and target.top_role >= mod.top_role:
-        return "That member's role is higher than or equal to yours."
+        return "رتبة العضو أعلى منك أو نفسك."
     if target.top_role >= guild.me.top_role:
-        return "My role is too low to do that. Move my role higher."
+        return "رتبتي تحت، ارفع رتبة البوت فوق."
     return None
 
 
@@ -35,9 +35,9 @@ async def mod_log(guild, action: str, target, moderator, reason: str | None, col
 
 
 async def try_dm(user, guild, action: str, reason: str | None, extra: str = ""):
-    e = discord.Embed(title=f"You were {action} in {guild.name}",
-                      description=f"**Reason:** {reason or 'No reason given'}{extra}\n\n"
-                                  "Think it's unfair? Open a Ban Appeal ticket.", color=RED)
+    e = discord.Embed(title=f"تم {action} في {guild.name}",
+                      description=f"**السبب:** {reason or 'بدون سبب'}{extra}\n\n"
+                                  "تشوف إنه ظلم؟ افتح تذكرة.", color=RED)
     try:
         await user.send(embed=e)
     except discord.HTTPException:
@@ -60,12 +60,12 @@ class Moderation(commands.Cog):
         warns = cfg(interaction.guild)["warnings"].setdefault(str(member.id), [])
         warns.append({"reason": reason, "mod": interaction.user.id, "time": now().isoformat()})
         await store.save()
-        await try_dm(member, interaction.guild, "warned", reason, f"\nYou now have **{len(warns)}** warning(s).")
+        await try_dm(member, interaction.guild, "تحذيرك", reason, f"\nصار عندك **{len(warns)}** تحذير.")
         await mod_log(interaction.guild, "Warn", member, interaction.user, reason, discord.Color.orange(),
                       f"Total warnings: {len(warns)}")
-        tip = "\n💡 That's 3+ warnings — maybe time for a `/timeout`." if len(warns) >= 3 else ""
+        tip = "\n💡 عنده ٣ تحذيرات أو أكثر — يمكن وقته `/timeout`." if len(warns) >= 3 else ""
         await interaction.response.send_message(
-            f"⚠️ {member.mention} has been warned. They now have **{len(warns)}** warning(s).{tip}")
+            f"⚠️ تم تحذير {member.mention}. صار عنده **{len(warns)}** تحذير.{tip}")
 
     @app_commands.command(name="warnings", description="See a member's warnings")
     @app_commands.default_permissions(moderate_members=True)
@@ -101,10 +101,10 @@ class Moderation(commands.Cog):
         problem = hierarchy_problem(interaction, member)
         if problem:
             return await interaction.response.send_message(problem, ephemeral=True)
-        await try_dm(member, interaction.guild, "kicked", reason)
+        await try_dm(member, interaction.guild, "طردك", reason)
         await member.kick(reason=f"{interaction.user}: {reason or 'No reason'}")
         await mod_log(interaction.guild, "Kick", member, interaction.user, reason)
-        await interaction.response.send_message(f"👢 {member} was kicked.")
+        await interaction.response.send_message(f"👢 تم طرد {member}.")
 
     @app_commands.command(name="ban", description="Ban a member from the Discord")
     @app_commands.default_permissions(ban_members=True)
@@ -116,11 +116,11 @@ class Moderation(commands.Cog):
         problem = hierarchy_problem(interaction, member)
         if problem:
             return await interaction.response.send_message(problem, ephemeral=True)
-        await try_dm(member, interaction.guild, "banned", reason)
+        await try_dm(member, interaction.guild, "حظرك", reason)
         await member.ban(reason=f"{interaction.user}: {reason or 'No reason'}",
                          delete_message_seconds=delete_days * 86400)
         await mod_log(interaction.guild, "Ban", member, interaction.user, reason)
-        await interaction.response.send_message(f"🔨 {member} was banned.")
+        await interaction.response.send_message(f"🔨 تم حظر {member}.")
 
     @app_commands.command(name="unban", description="Unban a user by their ID")
     @app_commands.default_permissions(ban_members=True)
@@ -149,13 +149,13 @@ class Moderation(commands.Cog):
             return await interaction.response.send_message(problem, ephemeral=True)
         td = parse_duration(duration)
         if td is None:
-            return await interaction.response.send_message("Use a duration like `10m`, `2h` or `1d`.", ephemeral=True)
+            return await interaction.response.send_message("اكتب المدة مثل `10m` أو `2h` أو `1d`.", ephemeral=True)
         td = min(td, datetime.timedelta(days=28))
         await member.timeout(td, reason=f"{interaction.user}: {reason or 'No reason'}")
-        await try_dm(member, interaction.guild, "timed out", reason, f"\n**Duration:** {fmt_duration(td)}")
+        await try_dm(member, interaction.guild, "إسكاتك", reason, f"\n**المدة:** {fmt_duration(td)}")
         await mod_log(interaction.guild, "Timeout", member, interaction.user, reason, discord.Color.orange(),
                       f"Duration: {fmt_duration(td)}")
-        await interaction.response.send_message(f"🔇 {member.mention} timed out for **{fmt_duration(td)}**.")
+        await interaction.response.send_message(f"🔇 تم إسكات {member.mention} لمدة **{fmt_duration(td)}**.")
 
     @app_commands.command(name="untimeout", description="Remove a member's timeout")
     @app_commands.default_permissions(moderate_members=True)
@@ -164,7 +164,7 @@ class Moderation(commands.Cog):
     async def untimeout(self, interaction: discord.Interaction, member: discord.Member):
         await member.timeout(None, reason=f"Removed by {interaction.user}")
         await mod_log(interaction.guild, "Timeout removed", member, interaction.user, None, GREEN)
-        await interaction.response.send_message(f"🔊 {member.mention} can talk again.")
+        await interaction.response.send_message(f"🔊 {member.mention} يقدر يتكلم مرة ثانية.")
 
     # ── channel tools ──
     @app_commands.command(name="purge", description="Delete recent messages in this channel")
@@ -177,7 +177,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         deleted = await interaction.channel.purge(
             limit=amount, check=(lambda m: m.author == member) if member else (lambda m: True))
-        await interaction.followup.send(f"🧹 Deleted {len(deleted)} message(s).")
+        await interaction.followup.send(f"🧹 تم حذف {len(deleted)} رسالة.")
 
     @app_commands.command(name="slowmode", description="Set slowmode for this channel (0 = off)")
     @app_commands.default_permissions(manage_channels=True)
@@ -194,8 +194,8 @@ class Moderation(commands.Cog):
         overwrite.send_messages = False if locked else None
         await interaction.channel.set_permissions(role, overwrite=overwrite,
                                                   reason=f"{interaction.user}: {reason or ''}")
-        e = discord.Embed(description=("🔒 This channel is locked." if locked else "🔓 This channel is unlocked.")
-                          + (f"\n**Reason:** {reason}" if reason else ""), color=RED if locked else GREEN)
+        e = discord.Embed(description=("🔒 تم قفل الروم." if locked else "🔓 تم فتح الروم.")
+                          + (f"\n**السبب:** {reason}" if reason else ""), color=RED if locked else GREEN)
         await interaction.response.send_message(embed=e)
 
     @app_commands.command(name="lock", description="Stop everyone from talking in this channel")
