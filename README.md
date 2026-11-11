@@ -1,51 +1,64 @@
-# Ticket Bot — setup (works fully from an iPad)
+# GTA Server Bot
 
-## 1. Create the bot (Safari on iPad is fine)
-1. Open https://discord.com/developers/applications → **New Application** → give it a name.
-2. **Bot** tab → **Reset Token** → copy the token. Never share it.
-3. Same tab → turn ON **Server Members Intent** → Save.
-4. **OAuth2 → URL Generator** → tick `bot` and `applications.commands`.
-   Bot permissions: **Administrator** (simplest), or: Manage Channels, Manage Roles,
-   Manage Messages, View Channels, Send Messages, Embed Links, Attach Files, Read Message History.
-5. Open the generated link → pick your friend's server → Authorize.
-   (Your friend must do this step, or give you Manage Server.)
+An all-in-one Discord bot for a GTA / FiveM roleplay server:
+tickets, live server status, whitelist applications, moderation, giveaways and more. **50+ commands.**
 
-## 2. Host it 24/7
-An iPad can't keep a bot running — iPadOS pauses apps in the background.
-Use a bot host with a web panel (works from Safari):
-1. Sign up, create a **Python** server.
-2. Upload `bot.py` and `requirements.txt` (Files tab / file manager).
-3. Set the startup file to `bot.py`.
-4. Add an environment / startup variable: `DISCORD_TOKEN` = your token
-   (or upload a `.env` file containing `DISCORD_TOKEN=your-token`).
-5. Press **Start**. The console should say `✅ Logged in as ...`.
-
-## 3. Configure in Discord (admins)
+## Run it (GitHub Codespaces, works on iPad)
+1. Add a Codespaces secret `DISCORD_TOKEN` (github.com/settings/codespaces).
+2. Open the repo → **Code → Codespaces → Create codespace**.
+3. In the terminal:
 ```
-/config support-role  @Staff
-/config log-channel   #ticket-logs
-/config category      Tickets        (optional — made automatically)
-/config autoclose     48             (optional, hours; 0 = off)
+pip install -r requirements.txt
+python bot.py
+```
+Wait for `✅ Logged in as ...`. Stop it at github.com/codespaces when you're done.
+
+## Create & invite the bot
+1. https://discord.com/developers/applications → New Application → **Bot** → Reset Token (copy it).
+2. Turn ON **Server Members Intent**.
+3. OAuth2 → URL Generator → `bot` + `applications.commands` → permission **Administrator** → open link → add to server.
+4. Server Settings → Roles: drag the bot's role **near the top** (above staff, whitelist and verify roles).
+
+## First-time setup (in Discord)
+```
+/config support-role        @Staff
+/config log-channel         #ticket-logs
+/config mod-log             #mod-logs
+/config server              123.45.67.89:30120   (connect_link optional)
+/config welcome-channel     #welcome
+/config verify-role         @Citizen
+/config applications-channel #applications   (staff-only channel)
+/config whitelist-role      @Whitelisted
+/config suggestion-channel  #suggestions
 /config view
 ```
-Then go to the channel for the panel (e.g. #support) and type `/setup`.
-
-Important: in Server Settings → Roles, drag the **bot's role above** the staff role.
+Then post the panels in their channels:
+`/ticket-panel` in #support · `/verify-panel` in #rules · `/apply-panel` in #whitelist · `/status-panel` in #server-status
 
 ## Commands
-| Command | Who | What |
-|---|---|---|
-| `/setup [title] [description]` | Admins | Post the ticket panel |
-| `/config ...` | Admins | Settings |
-| `/blacklist @user` | Admins | Block/unblock from opening tickets |
-| `/stats` | Anyone | Opened/closed counts + average rating |
-| `/claim` | Staff | Take ownership of a ticket |
-| `/close [reason]` | Owner / staff | Close the ticket |
-| `/add @user` | Owner / staff | Add someone to the ticket |
-| `/remove @user` | Staff | Remove someone |
-| `/rename name` | Staff | Rename the ticket channel |
+**🎫 Tickets** — `/ticket-panel` `/close` `/claim` `/add` `/remove` `/rename` `/blacklist` `/ticket-stats`
+Ticket types: Player Report, Bug Report, Ban Appeal, Refund / Lost Items, Donations, Gang / Business, General.
+Claim/close buttons, transcripts to logs + DM, 1–5 ⭐ ratings, auto-close, top staff leaderboard.
 
-## Customize ticket types
-Edit `TICKET_TYPES` at the top of `bot.py` (labels, emojis, form questions), then restart.
+**🟢 Server** — `/status` `/players` `/connect` `/status-panel` (auto-updates every minute) `/restart` `/announce`
+The bot's activity shows live player count.
 
-`data.json` is created automatically and stores settings and open tickets — don't delete it.
+**👥 Community** — `/verify-panel` (rules + accept button) `/apply-panel` (whitelist form → staff Approve/Deny →
+role + DM) `/suggest` · automatic welcome messages
+
+**🔨 Moderation** — `/warn` `/warnings` `/clearwarns` `/kick` `/ban` `/unban` `/timeout` `/untimeout`
+`/purge` `/slowmode` `/lock` `/unlock` — all logged, members get a DM
+
+**🧰 Utility** — `/help` `/ping` `/userinfo` `/serverinfo` `/avatar` `/poll`
+
+**🎲 Fun** — `/car` `/wanted` `/giveaway start|end|reroll`
+
+**⚙️ Settings** — `/config …` (13 settings)
+
+## Customize
+- Ticket types & form questions: `TICKET_TYPES` in `cogs/tickets.py`
+- Default rules: `DEFAULT_RULES` in `cogs/community.py`
+- Colors: `core.py`
+
+`data.json` is created automatically and stores settings, tickets, warnings and giveaways — don't delete it.
+In Codespaces it's kept as long as you don't delete the codespace.
