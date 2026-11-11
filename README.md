@@ -37,13 +37,13 @@ Then post the panels in their channels:
 
 ## Commands
 **🎫 Tickets** — `/ticket-panel` `/close` `/claim` `/add` `/remove` `/rename` `/blacklist` `/ticket-stats`
-Ticket types: Player Report, Bug Report, Ban Appeal, Refund / Lost Items, Donations, Gang / Business, General.
+Ticket types: Addon Not Working, Download Problem, Buy an Addon, Request an Addon, Partnership, Report a Member, General.
 Claim/close buttons, transcripts to logs + DM, 1–5 ⭐ ratings, auto-close, top staff leaderboard.
 
-**🟢 Server** — `/status` `/players` `/connect` `/status-panel` (auto-updates every minute) `/restart` `/announce`
+**🟢 Server** (optional — only if you run your own FiveM server) — `/status` `/players` `/connect` `/status-panel` (auto-updates every minute) `/restart` `/announce`
 The bot's activity shows live player count.
 
-**👥 Community** — `/verify-panel` (rules + accept button) `/apply-panel` (whitelist form → staff Approve/Deny →
+**👥 Community** — `/verify-panel` (rules + accept button) `/apply-panel` (optional, roleplay whitelist form → staff Approve/Deny →
 role + DM) `/suggest` · automatic welcome messages
 
 **🔨 Moderation** — `/warn` `/warnings` `/clearwarns` `/kick` `/ban` `/unban` `/timeout` `/untimeout`

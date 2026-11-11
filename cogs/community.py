@@ -10,11 +10,11 @@ from core import COLOR, GREEN, RED, cfg, is_staff, now, store
 
 DEFAULT_RULES = (
     "1. Respect everyone — no racism, harassment or hate.\n"
-    "2. No RDM / VDM (random killing or running people over).\n"
-    "3. No metagaming or powergaming.\n"
-    "4. Stay in character in the city.\n"
-    "5. No cheats, mods or exploits.\n"
-    "6. Staff decisions are final — appeal through a ticket."
+    "2. No spam, self-promo or advertising without a partnership.\n"
+    "3. Don't re-upload or sell our addons as your own.\n"
+    "4. Use the right channels — help goes in a ticket.\n"
+    "5. No NSFW, scams or harmful files.\n"
+    "6. Staff decisions are final."
 )
 
 
@@ -195,12 +195,12 @@ class Community(commands.Cog):
         if channel is None:
             return
         e = discord.Embed(
-            title=f"Welcome to {member.guild.name}! 🌴",
-            description=f"Hey {member.mention}, welcome to Los Santos!\n"
-                        "Read the rules, verify, then apply for whitelist to start your story.",
+            title=f"Welcome to {member.guild.name}! 👋",
+            description=f"Hey {member.mention}, welcome!\n"
+                        "Read the rules, check out the addons, and open a ticket if you need help.",
             color=COLOR)
         e.set_thumbnail(url=member.display_avatar.url)
-        e.set_footer(text=f"You are citizen #{member.guild.member_count}")
+        e.set_footer(text=f"You are member #{member.guild.member_count}")
         try:
             await channel.send(content=member.mention, embed=e)
         except discord.HTTPException:

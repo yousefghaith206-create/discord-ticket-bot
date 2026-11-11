@@ -12,54 +12,51 @@ from core import COLOR, GREEN, RED, cfg, is_staff, now, send_log, store
 
 # question format: (question ≤45 chars, required?, "short" | "long") — max 5 per type
 TICKET_TYPES = {
+    "addon": {
+        "label": "Addon Not Working", "emoji": "🛠️", "description": "Help installing or fixing an addon",
+        "questions": [
+            ("Which addon? (name / channel)", True, "short"),
+            ("What's the problem?", True, "long"),
+            ("What did you already try?", False, "long"),
+            ("Screenshot / video link", False, "short"),
+        ],
+    },
+    "download": {
+        "label": "Download Problem", "emoji": "📥", "description": "Broken link or file won't download",
+        "questions": [
+            ("Which file / addon?", True, "short"),
+            ("What happens when you download it?", True, "long"),
+        ],
+    },
+    "buy": {
+        "label": "Buy an Addon", "emoji": "💳", "description": "Paid addons, payments and orders",
+        "questions": [
+            ("Which addon do you want?", True, "short"),
+            ("Payment method / order ID (if paid)", False, "short"),
+            ("Anything else we should know?", False, "long"),
+        ],
+    },
+    "request": {
+        "label": "Request an Addon", "emoji": "💡", "description": "Ask for a new pack, sound or mod",
+        "questions": [
+            ("What do you want us to make or add?", True, "long"),
+            ("Example link (video / picture)", False, "short"),
+        ],
+    },
+    "partner": {
+        "label": "Partnership", "emoji": "🤝", "description": "Partner your server with us",
+        "questions": [
+            ("Your server name + invite link", True, "short"),
+            ("How many members?", True, "short"),
+            ("What is your server about?", True, "long"),
+        ],
+    },
     "report": {
-        "label": "Player Report", "emoji": "🚨", "description": "Report a player breaking the rules",
+        "label": "Report a Member", "emoji": "🚨", "description": "Someone breaking the rules",
         "questions": [
-            ("Your in-game name + server ID", True, "short"),
-            ("Reported player's name + server ID", True, "short"),
+            ("Who? (name or ID)", True, "short"),
             ("What happened?", True, "long"),
-            ("Clip / proof link (YouTube, Medal…)", False, "short"),
-        ],
-    },
-    "bug": {
-        "label": "Bug Report", "emoji": "🐛", "description": "Something is broken in the city",
-        "questions": [
-            ("What is broken?", True, "long"),
-            ("Where / how did it happen?", True, "long"),
-            ("Clip or screenshot link", False, "short"),
-        ],
-    },
-    "appeal": {
-        "label": "Ban Appeal", "emoji": "⚖️", "description": "Appeal a ban, kick or warning",
-        "questions": [
-            ("Your in-game name", True, "short"),
-            ("Ban reason / ban ID", True, "short"),
-            ("Why should it be removed?", True, "long"),
-        ],
-    },
-    "refund": {
-        "label": "Refund / Lost Items", "emoji": "💰", "description": "Lost money, cars or items",
-        "questions": [
-            ("Your in-game name + server ID", True, "short"),
-            ("What did you lose? (item, car, $)", True, "long"),
-            ("How did it happen? (bug, crash…)", True, "long"),
-            ("Proof link", False, "short"),
-        ],
-    },
-    "donation": {
-        "label": "Donations / Store", "emoji": "💳", "description": "Store purchases and perks",
-        "questions": [
-            ("Your in-game name", True, "short"),
-            ("Order / transaction ID", True, "short"),
-            ("Describe the problem", True, "long"),
-        ],
-    },
-    "gang": {
-        "label": "Gang / Business", "emoji": "🔫", "description": "Start a gang, business or job",
-        "questions": [
-            ("Group name", True, "short"),
-            ("Leader + members (in-game names)", True, "long"),
-            ("What is your plan / RP idea?", True, "long"),
+            ("Proof (screenshot / link)", False, "short"),
         ],
     },
     "support": {
@@ -192,7 +189,7 @@ async def create_ticket(guild: discord.Guild, user: discord.Member, type_key: st
     embed = discord.Embed(
         title=f"{info['emoji']} {info['label']} — Ticket #{number:04d}",
         description=f"Hi {user.mention}, thanks for reaching out! Staff will be with you soon.\n"
-                    "Add any extra details, clips or screenshots below.",
+                    "Add any extra details or screenshots below.",
         color=COLOR, timestamp=now())
     for question, answer in answers:
         embed.add_field(name=question, value=answer[:1024], inline=False)
@@ -423,7 +420,7 @@ class Tickets(commands.Cog):
     @app_commands.guild_only()
     async def ticket_panel(self, interaction: discord.Interaction,
                            title: str = "📩 Support Tickets",
-                           description: str = "Need help in the city? Pick a category below and a private ticket "
+                           description: str = "Need help with an addon? Pick a category below and a private ticket "
                                               "will be opened with staff."):
         embed = discord.Embed(title=title, description=description, color=COLOR)
         embed.add_field(name="Categories", inline=False, value="\n".join(
