@@ -141,6 +141,7 @@ class TicketForm(discord.ui.Modal):
         info = TICKET_TYPES[type_key]
         super().__init__(title=f"تذكرة {info['label']}"[:45])
         self.type_key = type_key
+        self.questions = [q[0][:45] for q in info["questions"][:5]]
         for question, required, style in info["questions"][:5]:
             self.add_item(discord.ui.TextInput(
                 label=question[:45], required=required, max_length=1000,
@@ -151,7 +152,7 @@ class TicketForm(discord.ui.Modal):
         existing = open_ticket_of(interaction.guild, interaction.user.id)
         if existing:
             return await interaction.followup.send(f"عندك تذكرة مفتوحة: {existing.mention}")
-        answers = [(item.label, item.value or "—") for item in self.children]
+        answers = [(q, item.value or "—") for q, item in zip(self.questions, self.children)]
         try:
             channel = await create_ticket(interaction.guild, interaction.user, self.type_key, answers)
         except discord.Forbidden:
