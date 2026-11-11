@@ -44,15 +44,15 @@ class Utility(commands.Cog):
         member = member or interaction.user
         e = discord.Embed(title=str(member), color=member.color if member.color.value else COLOR)
         e.set_thumbnail(url=member.display_avatar.url)
-        e.add_field(name="Nickname", value=member.display_name)
-        e.add_field(name="ID", value=f"`{member.id}`")
-        e.add_field(name="Account created", value=discord.utils.format_dt(member.created_at, "R"))
+        e.add_field(name="الاسم", value=member.display_name)
+        e.add_field(name="الآيدي", value=f"`{member.id}`")
+        e.add_field(name="إنشاء الحساب", value=discord.utils.format_dt(member.created_at, "R"))
         if member.joined_at:
-            e.add_field(name="Joined server", value=discord.utils.format_dt(member.joined_at, "R"))
+            e.add_field(name="دخل السيرفر", value=discord.utils.format_dt(member.joined_at, "R"))
         warns = len(cfg(interaction.guild)["warnings"].get(str(member.id), []))
-        e.add_field(name="Warnings", value=str(warns))
+        e.add_field(name="التحذيرات", value=str(warns))
         roles = [r.mention for r in reversed(member.roles) if r != interaction.guild.default_role]
-        e.add_field(name=f"Roles ({len(roles)})", value=" ".join(roles[:15]) or "None", inline=False)
+        e.add_field(name=f"الرتب ({len(roles)})", value=" ".join(roles[:15]) or "ما فيه", inline=False)
         await interaction.response.send_message(embed=e)
 
     @app_commands.command(name="serverinfo", description="Info about this Discord server")
@@ -62,18 +62,18 @@ class Utility(commands.Cog):
         e = discord.Embed(title=g.name, color=COLOR, timestamp=now())
         if g.icon:
             e.set_thumbnail(url=g.icon.url)
-        e.add_field(name="Owner", value=g.owner.mention if g.owner else "?")
-        e.add_field(name="Members", value=str(g.member_count))
-        e.add_field(name="Created", value=discord.utils.format_dt(g.created_at, "R"))
-        e.add_field(name="Channels", value=f"{len(g.text_channels)} text · {len(g.voice_channels)} voice")
-        e.add_field(name="Roles", value=str(len(g.roles)))
-        e.add_field(name="Boosts", value=f"{g.premium_subscription_count} (level {g.premium_tier})")
+        e.add_field(name="المالك", value=g.owner.mention if g.owner else "?")
+        e.add_field(name="الأعضاء", value=str(g.member_count))
+        e.add_field(name="تاريخ الإنشاء", value=discord.utils.format_dt(g.created_at, "R"))
+        e.add_field(name="الرومات", value=f"{len(g.text_channels)} كتابي · {len(g.voice_channels)} صوتي")
+        e.add_field(name="الرتب", value=str(len(g.roles)))
+        e.add_field(name="البوستات", value=f"{g.premium_subscription_count} (لفل {g.premium_tier})")
         await interaction.response.send_message(embed=e)
 
     @app_commands.command(name="avatar", description="Show someone's profile picture")
     async def avatar(self, interaction: discord.Interaction, member: discord.Member | None = None):
         member = member or interaction.user
-        e = discord.Embed(title=f"{member.display_name}'s avatar", color=COLOR)
+        e = discord.Embed(title=f"صورة {member.display_name}", color=COLOR)
         e.set_image(url=member.display_avatar.with_size(1024).url)
         await interaction.response.send_message(embed=e)
 
@@ -82,7 +82,7 @@ class Utility(commands.Cog):
     async def poll(self, interaction: discord.Interaction, question: str, options: str | None = None):
         choices = [o.strip() for o in (options or "").split("|") if o.strip()][:10]
         e = discord.Embed(title=f"📊 {question}", color=COLOR, timestamp=now())
-        e.set_footer(text=f"Poll by {interaction.user.display_name}")
+        e.set_footer(text=f"تصويت من {interaction.user.display_name}")
         if len(choices) >= 2:
             e.description = "\n".join(f"{NUMBERS[i]} {c}" for i, c in enumerate(choices))
             reactions = NUMBERS[:len(choices)]

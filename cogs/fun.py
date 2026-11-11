@@ -20,29 +20,28 @@ CARS = [
     ("Shitzu Hakuchou", "Motorcycle"), ("Western Daemon", "Motorcycle"), ("Brute Stockade", "Armored"),
     ("Vapid Police Cruiser", "Emergency"),
 ]
-PAINTS = ["Metallic Black", "Matte Red", "Chrome", "Pearl White", "Lime Green", "Midnight Blue",
-          "Hot Pink", "Gold", "Matte Olive", "Candy Purple"]
-CAR_LINES = ["Perfect for escaping the cops.", "Mechanic says it's 'mostly' legal.",
-             "Found it parked outside Legion Square with the keys in.", "Smells like Burger Shot inside.",
-             "Previous owner: unknown. Don't ask.", "Fresh from Los Santos Customs."]
-CRIMES = ["Stole a Pegassi Zentorno from the dealership", "Robbed the 24/7 on Route 68",
-          "Ran over a mime at Vespucci Beach", "Speeding through the Del Perro tunnel",
-          "Jaywalking in front of the LSPD station", "Tried to rob the Pacific Standard with a bat",
-          "Parked a tank in Legion Square", "Started a fight at the Vanilla Unicorn",
-          "Stole a plane from LSIA", "Refused to pay at Burger Shot"]
-
+PAINTS = ["أسود ميتاليك", "أحمر مطفي", "كروم", "أبيض لؤلؤي", "أخضر ليموني", "أزرق ليلي",
+          "وردي فاقع", "ذهبي", "زيتي مطفي", "بنفسجي لامع"]
+CAR_LINES = ["مثالية للهروب من الشرطة 🚓", "الميكانيكي يقول إنها قانونية… تقريباً.",
+             "لقيتها واقفة في Legion Square والمفتاح فيها.", "ريحتها من داخل Burger Shot.",
+             "صاحبها الأول؟ مجهول. لا تسأل.", "طالعة توها من Los Santos Customs."]
+CRIMES = ["سرق Zentorno من المعرض", "سرق بقالة 24/7 على طريق 68",
+          "دعم مهرج في شاطئ Vespucci", "سرعة جنونية في نفق Del Perro",
+          "قطع الشارع قدام مركز الشرطة", "حاول يسرق البنك بعصا",
+          "وقّف دبابة في Legion Square", "سوّى مضاربة في Vanilla Unicorn",
+          "سرق طيارة من المطار", "ما دفع حساب Burger Shot"]
 
 def giveaway_embed(gw: dict, ended=False, winners: list[int] | None = None) -> discord.Embed:
     ends = datetime.datetime.fromisoformat(gw["ends"])
-    e = discord.Embed(title=f"🎉 GIVEAWAY: {gw['prize']}", color=GREEN if ended else COLOR)
+    e = discord.Embed(title=f"🎉 قيف أواي: {gw['prize']}", color=GREEN if ended else COLOR)
     if ended:
-        e.description = ("**Winner(s):** " + ", ".join(f"<@{w}>" for w in winners)) if winners else "No valid entries 😢"
+        e.description = ("**الفائز:** " + ", ".join(f"<@{w}>" for w in winners)) if winners else "ما أحد شارك 😢"
     else:
-        e.description = f"Press **🎉 Join** to enter!\nEnds {discord.utils.format_dt(ends, 'R')}"
-    e.add_field(name="Winners", value=str(gw["winners"]))
-    e.add_field(name="Entries", value=str(len(gw["entries"])))
-    e.add_field(name="Hosted by", value=f"<@{gw['host']}>")
-    e.set_footer(text="Ended" if ended else "Ends at")
+        e.description = f"اضغط **🎉 دخول** عشان تشارك!\nينتهي {discord.utils.format_dt(ends, 'R')}"
+    e.add_field(name="عدد الفائزين", value=str(gw["winners"]))
+    e.add_field(name="المشاركين", value=str(len(gw["entries"])))
+    e.add_field(name="المقدّم", value=f"<@{gw['host']}>")
+    e.set_footer(text="انتهى" if ended else "ينتهي")
     e.timestamp = ends
     return e
 
@@ -51,18 +50,18 @@ class GiveawayView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Join", emoji="🎉", style=discord.ButtonStyle.success, custom_id="giveaway:join")
+    @discord.ui.button(label="دخول", emoji="🎉", style=discord.ButtonStyle.success, custom_id="giveaway:join")
     async def join(self, interaction: discord.Interaction, button: discord.ui.Button):
         gw = cfg(interaction.guild)["giveaways"].get(str(interaction.message.id))
         if gw is None or gw["ended"]:
-            return await interaction.response.send_message("This giveaway has ended.", ephemeral=True)
+            return await interaction.response.send_message("القيف أواي انتهى.", ephemeral=True)
         uid = interaction.user.id
         if uid in gw["entries"]:
             gw["entries"].remove(uid)
-            text = "You left the giveaway."
+            text = "طلعت من القيف أواي."
         else:
             gw["entries"].append(uid)
-            text = "🎉 You're in! Good luck."
+            text = "🎉 دخلت! بالتوفيق."
         await store.save()
         await interaction.response.edit_message(embed=giveaway_embed(gw))
         await interaction.followup.send(text, ephemeral=True)
@@ -83,23 +82,23 @@ class Fun(commands.Cog):
         self.giveaway_loop.cancel()
 
     # ── fun commands ──
-    @app_commands.command(name="car", description="Get a random GTA ride")
+    @app_commands.command(name="car", description="سيارة GTA عشوائية لك 🚗")
     async def car(self, interaction: discord.Interaction):
         name, cls = random.choice(CARS)
-        e = discord.Embed(title=f"🚗 Your ride: {name}", description=random.choice(CAR_LINES), color=COLOR)
-        e.add_field(name="Class", value=cls)
-        e.add_field(name="Paint", value=random.choice(PAINTS))
-        e.add_field(name="Top speed", value=f"{random.randint(110, 220)} mph")
+        e = discord.Embed(title=f"🚗 سيارتك: {name}", description=random.choice(CAR_LINES), color=COLOR)
+        e.add_field(name="الفئة", value=cls)
+        e.add_field(name="اللون", value=random.choice(PAINTS))
+        e.add_field(name="السرعة القصوى", value=f"{random.randint(180, 350)} كم/س")
         await interaction.response.send_message(embed=e)
 
-    @app_commands.command(name="wanted", description="Check someone's wanted level ⭐")
+    @app_commands.command(name="wanted", description="شوف مستوى المطلوبية لأحد ⭐")
     async def wanted(self, interaction: discord.Interaction, member: discord.Member | None = None):
         member = member or interaction.user
         stars = random.randint(0, 5)
-        e = discord.Embed(title=f"🚨 Wanted level: {member.display_name}",
+        e = discord.Embed(title=f"🚨 مستوى المطلوبية: {member.display_name}",
                           description=("⭐" * stars + "☆" * (5 - stars)) + "\n" +
-                                      ("Clean record. Suspicious… 🤨" if stars == 0 else
-                                       f"**Crime:** {random.choice(CRIMES)}"),
+                                      ("سجله نظيف… مشبوه 🤨" if stars == 0 else
+                                       f"**الجريمة:** {random.choice(CRIMES)}"),
                           color=discord.Color.red() if stars >= 3 else COLOR)
         e.set_thumbnail(url=member.display_avatar.url)
         await interaction.response.send_message(embed=e)
@@ -122,8 +121,8 @@ class Fun(commands.Cog):
                     embed=giveaway_embed(gw, ended=True, winners=winners), view=None)
             except discord.HTTPException:
                 pass
-            text = (f"🎉 {'New winner' if reroll else 'Congrats'} " + ", ".join(f"<@{w}>" for w in winners)
-                    + f"! You won **{gw['prize']}**!") if winners else f"Nobody joined the **{gw['prize']}** giveaway 😢"
+            text = (f"🎉 {'فائز جديد' if reroll else 'مبروك'} " + ", ".join(f"<@{w}>" for w in winners)
+                    + f"! فزت بـ **{gw['prize']}**!") if winners else f"ما أحد شارك في قيف أواي **{gw['prize']}** 😢"
             try:
                 await channel.send(text, allowed_mentions=discord.AllowedMentions(users=True))
             except discord.HTTPException:

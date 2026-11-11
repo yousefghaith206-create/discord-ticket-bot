@@ -40,16 +40,16 @@ async def fetch_server(address: str) -> dict:
 def status_embed(guild: discord.Guild, info: dict) -> discord.Embed:
     g = cfg(guild)
     if info["online"]:
-        e = discord.Embed(title=f"🟢 {info['hostname'][:200] or 'Server online'}", color=GREEN, timestamp=now())
-        e.add_field(name="Status", value="Online")
-        e.add_field(name="Players", value=f"{info['clients']}/{info['max'] or '?'}")
+        e = discord.Embed(title=f"🟢 {info['hostname'][:200] or 'السيرفر شغّال'}", color=GREEN, timestamp=now())
+        e.add_field(name="الحالة", value="شغّال 🟢")
+        e.add_field(name="اللاعبين", value=f"{info['clients']}/{info['max'] or '?'}")
     else:
-        e = discord.Embed(title="🔴 Server offline", description="The city is down or restarting. Hang tight!",
+        e = discord.Embed(title="🔴 السيرفر طافي", description="السيرفر طافي أو يسوي ريستارت. انتظر شوي!",
                           color=RED, timestamp=now())
     if g["connect_link"]:
-        e.add_field(name="Join", value=g["connect_link"], inline=False)
+        e.add_field(name="دخول", value=g["connect_link"], inline=False)
     e.add_field(name="F8 console", value=f"`connect {g['server_ip']}`", inline=False)
-    e.set_footer(text="Last updated")
+    e.set_footer(text="آخر تحديث")
     return e
 
 
@@ -67,7 +67,7 @@ class Server(commands.Cog):
         address = cfg(interaction.guild)["server_ip"]
         if not address:
             await interaction.response.send_message(
-                "No server set yet. An admin can run `/config server 1.2.3.4:30120`.", ephemeral=True)
+                "ما فيه سيرفر محدد. الأدمن يقدر يسوي `/config server 1.2.3.4:30120`.", ephemeral=True)
         return address
 
     # ── live status panel + bot activity ──
@@ -117,17 +117,17 @@ class Server(commands.Cog):
         await interaction.response.defer()
         info = await fetch_server(address)
         if not info["online"]:
-            return await interaction.followup.send("🔴 The server is offline right now.")
-        e = discord.Embed(title=f"👥 Players online — {info['clients']}/{info['max'] or '?'}", color=COLOR,
+            return await interaction.followup.send("🔴 السيرفر طافي الحين.")
+        e = discord.Embed(title=f"👥 اللاعبين الحين — {info['clients']}/{info['max'] or '?'}", color=COLOR,
                           timestamp=now())
         if info["players"] is None:
-            e.description = "The server hides its player list."
+            e.description = "السيرفر مخفي قائمة اللاعبين."
         elif not info["players"]:
-            e.description = "The city is empty right now. Be the first one in!"
+            e.description = "السيرفر فاضي الحين. كن أول واحد يدخل!"
         else:
             rows = [f"`{p.get('id', '?'):>3}` {p.get('name', 'Unknown')[:30]} — {p.get('ping', '?')}ms"
                     for p in sorted(info["players"], key=lambda p: p.get("id", 0))]
-            e.description = "\n".join(rows[:50]) + (f"\n…and {len(rows) - 50} more" if len(rows) > 50 else "")
+            e.description = "\n".join(rows[:50]) + (f"\n…و {len(rows) - 50} غيرهم" if len(rows) > 50 else "")
         await interaction.followup.send(embed=e)
 
     @app_commands.command(name="connect", description="How to join the GTA server")
@@ -135,13 +135,13 @@ class Server(commands.Cog):
     async def connect(self, interaction: discord.Interaction):
         g = cfg(interaction.guild)
         if not g["server_ip"] and not g["connect_link"]:
-            return await interaction.response.send_message("The server address hasn't been set yet.", ephemeral=True)
-        e = discord.Embed(title="🎮 How to join", color=COLOR)
-        steps = ["Open **FiveM**"]
+            return await interaction.response.send_message("عنوان السيرفر ما انحدد بعد.", ephemeral=True)
+        e = discord.Embed(title="🎮 طريقة الدخول", color=COLOR)
+        steps = ["افتح **FiveM**"]
         if g["connect_link"]:
-            steps.append(f"Click: {g['connect_link']}")
+            steps.append(f"اضغط: {g['connect_link']}")
         if g["server_ip"]:
-            steps.append(f"Or press **F8** and type `connect {g['server_ip']}`")
+            steps.append(f"أو اضغط **F8** واكتب `connect {g['server_ip']}`")
         e.description = "\n".join(f"{i}. {s}" for i, s in enumerate(steps, 1))
         await interaction.response.send_message(embed=e)
 
@@ -164,13 +164,13 @@ class Server(commands.Cog):
     @app_commands.guild_only()
     @app_commands.describe(minutes="Minutes until restart (0 = now)", ping="Ping @everyone?")
     async def restart(self, interaction: discord.Interaction, minutes: app_commands.Range[int, 0, 180],
-                      reason: str = "Scheduled restart", ping: bool = False):
-        when = "**right now**" if minutes == 0 else f"in **{minutes} minute{'s' if minutes != 1 else ''}**"
+                      reason: str = "ريستارت مجدول", ping: bool = False):
+        when = "**الحين**" if minutes == 0 else f"بعد **{minutes} دقيقة**"
         ts = int(now().timestamp()) + minutes * 60
-        e = discord.Embed(title="🔄 Server restart", color=discord.Color.orange(),
-                          description=f"The city restarts {when} (<t:{ts}:t>).\n**Reason:** {reason}\n\n"
-                                      "Park your cars and get somewhere safe! 🚗")
-        e.set_footer(text=f"Announced by {interaction.user.display_name}")
+        e = discord.Embed(title="🔄 ريستارت السيرفر", color=discord.Color.orange(),
+                          description=f"السيرفر بيسوي ريستارت {when} (<t:{ts}:t>).\n**السبب:** {reason}\n\n"
+                                      "وقّف سيارتك وروح مكان آمن! 🚗")
+        e.set_footer(text=f"الإعلان من {interaction.user.display_name}")
         await interaction.response.send_message(
             content="@everyone" if ping else None, embed=e,
             allowed_mentions=discord.AllowedMentions(everyone=ping))
@@ -185,7 +185,7 @@ class Server(commands.Cog):
         e.set_footer(text=f"— {interaction.user.display_name}")
         await target.send(content="@everyone" if ping else None, embed=e,
                           allowed_mentions=discord.AllowedMentions(everyone=ping))
-        await interaction.response.send_message(f"✅ Posted in {target.mention}", ephemeral=True)
+        await interaction.response.send_message(f"✅ تم النشر في {target.mention}", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):
